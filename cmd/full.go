@@ -15,7 +15,7 @@ func (r *FullCmd) Run(ctx *Context) error {
 	page, cookies := purevpn.Login(ctx.Config.Username, ctx.Config.Password)
 	defer page.MustClose()
 
-	if ctx.Debug {
+	if ctx.Config.Debug {
 		fmt.Println("Successfully Logged in")
 	}
 
@@ -29,7 +29,7 @@ func (r *FullCmd) Run(ctx *Context) error {
 		return err
 	}
 
-	if ctx.Debug {
+	if ctx.Config.Debug {
 		fmt.Println("Successfully parsed user data")
 	}
 
@@ -39,7 +39,7 @@ func (r *FullCmd) Run(ctx *Context) error {
 		}
 	}
 
-	if ctx.Debug {
+	if ctx.Config.Debug {
 		fmt.Printf("Selected subscription %v\n", ctx.Config.Subscription.Username)
 	}
 
@@ -47,7 +47,7 @@ func (r *FullCmd) Run(ctx *Context) error {
 		return err
 	}
 
-	if ctx.Debug {
+	if ctx.Config.Debug {
 		fmt.Println("Successfully got subscription password")
 		fmt.Printf("ctx.Config: %v\n", ctx.Config)
 	}
@@ -55,11 +55,11 @@ func (r *FullCmd) Run(ctx *Context) error {
 	server, err := purevpn.GetWireguardServer(page, ctx.Config, token[0].Value)
 
 	if err == nil {
-		if ctx.Debug {
+		if ctx.Config.Debug {
 			fmt.Printf("Got wireguard server: %v\n", server)
 		}
 		err = wireguard.UpdateConfig([]byte(server), ctx.Config)
-		if ctx.Debug && err == nil {
+		if ctx.Config.Debug && err == nil {
 			fmt.Printf("Created wireguard file at %v\n", ctx.Config.WireguardFile)
 		}
 	}

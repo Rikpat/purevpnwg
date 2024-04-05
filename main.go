@@ -9,6 +9,6 @@ import (
 
 func main() {
 	ctx := kong.Parse(&purevpnwg.CLI, kong.Configuration(kongyaml.Loader, "/etc/purevpnwg/config.yml", "~/.purevpnwg.yml", util.CONFIG_FILE))
-	err := ctx.Run(&purevpnwg.Context{Debug: purevpnwg.CLI.Debug, Config: purevpnwg.CLI.Config})
+	err := ctx.Run(&purevpnwg.Context{Config: purevpnwg.CLI.Config})
 	ctx.FatalIfErrorf(err)
 }

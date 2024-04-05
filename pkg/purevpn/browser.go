@@ -88,6 +88,9 @@ func GetWireguardServer(page *rod.Page, config *util.Config, token string) (stri
 	if err != nil {
 		return "", err
 	}
+	if config.Debug {
+		fmt.Printf("Generated keys, publicKey: %v, privateKey: %v\n", publicKey, privateKey)
+	}
 
 	params := url.Values{}
 	params.Add("sUsername", config.Subscription.Username)

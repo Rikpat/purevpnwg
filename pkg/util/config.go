@@ -20,6 +20,7 @@ type ServerConfig struct {
 }
 
 type Config struct {
+	Debug         bool              `flag:"" yaml:"debug" help:"Enable debug mode."`
 	Username      string            `flag:"" yaml:"username" required:"" env:"USERNAME" help:"PureVPN username (email)."`
 	Password      string            `flag:"" yaml:"password" required:"" env:"PASSWORD" help:"PureVPN password."`
 	UUID          string            `yaml:"uuid" kong:"-"`
