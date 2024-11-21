@@ -1,8 +1,10 @@
 package purevpn
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/Rikpat/purevpnwg/pkg/util"
@@ -32,9 +34,18 @@ func Login(username, password string) (*rod.Page, []*proto.NetworkCookie) {
 
 	page.MustWaitIdle()
 
-	cookies := page.Browser().MustGetCookies()
+	cookies := page.MustCookies()
+	cookiesJSON, err := json.Marshal(cookies)
+	if err != nil {
+		panic(fmt.Sprintf("failed to marshal cookies: %v", err))
+	}
 
-	return page, cookies
+	customCookies, err := util.UnmarshalCookies(cookiesJSON)
+	if err != nil {
+		panic(fmt.Sprintf("failed to unmarshal cookies: %v", err))
+	}
+
+	return page, customCookies
 }
 
 func InitPage() (*rod.Page, error) {
@@ -135,4 +146,54 @@ func GetWireguardServer(page *rod.Page, config *util.Config, token string) (stri
 	}
 
 	return res.Value.Str(), nil
+}
+
+func GetManualServer(page *rod.Page, config *util.Config, token string) (string, error) {
+	params := url.Values{}
+	params.Add("sUsername", config.Subscription.Username)
+	params.Add("sCountrySlug", "NL")
+	params.Add("iCityId", "2902")
+	params.Add("sProtocolSlug1", "UDP")
+	params.Add("aTagsFilter", "")
+
+	if config.Debug {
+		fmt.Printf("Requesting ovpn config with params: %v\n", params)
+	}
+
+	page.MustNavigate(_BASE_URL).MustWaitNavigation()
+	res, err := page.Eval(`
+        async (body, authorization) => {
+            const res = await fetch(
+                "/v2/api/manual/get-mc-server",
+                {
+                    method: "POST",
+                    body: new URLSearchParams(body).toString(),
+                    headers: {
+                        'content-type': 'application/x-www-form-urlencoded',
+                        'accept': 'application/json',
+                        'authorization': authorization
+                    }
+                }
+            )
+            if (!res.ok) {
+                throw Error(await res.text())
+            }
+            const json = await res.json()
+            if (!json.status) {
+                throw Error(JSON.stringify(json))
+            }
+            return json.body.configuration
+        }
+    `, params.Encode(), "Bearer "+token)
+	if err != nil {
+		return "", err
+	}
+
+	fmt.Printf("Adjusting auth-user-pass string in config\n")
+	configStr := res.Value.Str()
+	configStr = strings.Replace(configStr, "auth-user-pass", "auth-user-pass /vpn/login.conf", 1)
+	// Remove extra spaces at the start of the lines
+	configStr = strings.ReplaceAll(configStr, "\n ", "\n")
+
+	return configStr, nil
 }

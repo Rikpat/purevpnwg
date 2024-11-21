@@ -28,6 +28,7 @@ type Config struct {
 	Subscription  *SubscriptionAuth `embed:"" prefix:"subscription." envprefix:"SUBSCRIPTION_"`
 	Device        string            `yaml:"device" env:"DEVICE" default:"linux"`
 	WireguardFile string            `flag:"" yaml:"wireguardFile" env:"WIREGUARD_FILE" default:"wg0.conf"`
+	OvpnPath      string            `flag:"" yaml:"ovpnPath" env:"OVPN_PATH" default:"vpn.conf" help:"Path to save the OpenVPN configuration file."`
 }
 
 func (sub *SubscriptionAuth) GetEncryptPassword(page *rod.Page, token string) error {
@@ -85,4 +86,8 @@ func ReadConfig() (*Config, error) {
 		return nil, err
 	}
 	return &conf, nil
+}
+
+func WriteServerConfig(filePath, config string) error {
+	return os.WriteFile(filePath, []byte(config), 0644)
 }

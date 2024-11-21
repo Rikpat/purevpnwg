@@ -3,15 +3,14 @@ RUN apk add --no-cache \
       chromium \
       chromium-swiftshader
 
-ARG TARGETOS TARGETARCH
-
-COPY --chmod="111" dist/purevpnwg-${TARGETOS}-${TARGETARCH} /bin/purevpnwg
+COPY purevpnwg /bin/purevpnwg
 
 ENV PUREVPN_USERNAME=""
 ENV PUREVPN_PASSWORD=""
-ENV PUREVPN_SERVER_COUNTRY="US"
-# New York
-ENV PUREVPN_SERVER_CITY="8778"
+
+# Amsterdam
+ENV PUREVPN_SERVER_COUNTRY="NL"
+ENV PUREVPN_SERVER_CITY="2902"
 ENV PUREVPN_WIREGUARD_FILE="/out/wg0.conf"
 
 ENTRYPOINT ["/bin/purevpnwg", "full"]
