@@ -15,7 +15,7 @@ import (
 )
 
 // Change if changed in the future
-const _BASE_URL = "https://my.purevpn.com/v2/dashboard/security-tools"
+const _BASE_URL = "https://my.purevpn.com/"
 
 var _PATH, _ = launcher.LookPath()
 var _LAUNCHER = launcher.New().Bin(_PATH).Leakless(false).MustLaunch()
