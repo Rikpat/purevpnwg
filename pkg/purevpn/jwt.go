@@ -3,11 +3,7 @@ package purevpn
 import (
 	"encoding/base64"
 	"encoding/json"
-	"fmt"
 	"strings"
-
-	"github.com/Rikpat/purevpnwg/pkg/util"
-	"github.com/manifoldco/promptui"
 )
 
 // Generated from JWT payload
@@ -55,18 +51,18 @@ type User struct {
 }
 
 type UserData struct {
-	AccountCode          string                    `json:"accountCode"`
-	BillingType          string                    `json:"billingType"`
-	Email                string                    `json:"email"`
-	IsMigratedToEmail    int64                     `json:"isMigratedToEmail"`
-	MaType               int64                     `json:"maType"`
-	Subscription         map[string][]Subscription `json:"subscription"`
-	Type                 string                    `json:"type"`
-	IsMAAutoLoginAllowed bool                      `json:"isMAAutoLoginAllowed"`
-	IsDomeUser           bool                      `json:"isDomeUser"`
+	AccountCode          string                       `json:"accountCode"`
+	BillingType          string                       `json:"billingType"`
+	Email                string                       `json:"email"`
+	IsMigratedToEmail    int64                        `json:"isMigratedToEmail"`
+	MaType               int64                        `json:"maType"`
+	Subscription         map[string][]JWTSubscription `json:"subscription"`
+	Type                 string                       `json:"type"`
+	IsMAAutoLoginAllowed bool                         `json:"isMAAutoLoginAllowed"`
+	IsDomeUser           bool                         `json:"isDomeUser"`
 }
 
-type Subscription struct {
+type JWTSubscription struct {
 	Addons           []interface{} `json:"addons"`
 	BillingCycle     string        `json:"billingCycle"`
 	Expiry           string        `json:"expiry"`
@@ -105,33 +101,4 @@ func GetUserData(jwtString string) (*UserData, error) {
 	} else {
 		return &jwt.User.Data, nil
 	}
-}
-
-func (user *UserData) getActiveSubscriptions() (subs []string) {
-	for _, s := range user.Subscription[user.Type] {
-		if s.Status == "active" {
-			subs = append(subs, s.Vpnusername)
-		}
-	}
-	return subs
-}
-
-func (user *UserData) SelectSubscription() (*util.SubscriptionAuth, error) {
-	subs := user.getActiveSubscriptions()
-	if len(subs) > 1 {
-		prompt := promptui.Select{
-			Label: "Select Subscription",
-			Items: subs,
-		}
-
-		_, result, err := prompt.Run()
-
-		if err != nil {
-			fmt.Printf("Prompt failed %v\n", err)
-			return nil, err
-		}
-
-		return &util.SubscriptionAuth{Username: result}, nil
-	}
-	return &util.SubscriptionAuth{Username: subs[0]}, nil
 }

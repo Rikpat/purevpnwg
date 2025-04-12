@@ -10,13 +10,14 @@ import (
 const CONFIG_FILE = "config.yml"
 
 type SubscriptionAuth struct {
-	Username string `flag:"" yaml:"username" env:"ID" help:"PureVPN subscription ID"`
+	ID       string `flag:"" yaml:"id" env:"ID" help:"PureVPN subscription ID"`
+	Username string `flag:"" yaml:"username" env:"USERNAME" help:"PureVPN subscription username"`
 	Password string `flag:"" yaml:"password" env:"PASSWORD" help:"PureVPN subscription password (not necessary)"`
 }
 
 type ServerConfig struct {
 	Country string `flag:"" yaml:"country" env:"COUNTRY" help:"PureVPN server country (example: US)."`
-	City    string `flag:"" yaml:"city" env:"CITY" help:"PureVPN server city (example: 8778 for New York)."`
+	City    int    `flag:"" yaml:"city" env:"CITY" help:"PureVPN server city (example: 8778 for New York)."`
 }
 
 type Config struct {
@@ -24,8 +25,8 @@ type Config struct {
 	Username      string            `flag:"" yaml:"username" required:"" env:"USERNAME" help:"PureVPN username (email)."`
 	Password      string            `flag:"" yaml:"password" required:"" env:"PASSWORD" help:"PureVPN password."`
 	UUID          string            `yaml:"uuid" kong:"-"`
-	Server        *ServerConfig     `yaml:"server" embed:"" prefix:"server." envprefix:"SERVER_"`
-	Subscription  *SubscriptionAuth `embed:"" prefix:"subscription." envprefix:"SUBSCRIPTION_"`
+	Server        *ServerConfig     `yaml:"server" embed:"" prefix:"server-" envprefix:"SERVER_"`
+	Subscription  *SubscriptionAuth `embed:"" yaml:"subscription" prefix:"subscription-" envprefix:"SUBSCRIPTION_"`
 	Device        string            `yaml:"device" env:"DEVICE" default:"linux"`
 	WireguardFile string            `flag:"" yaml:"wireguardFile" env:"WIREGUARD_FILE" default:"wg0.conf"`
 }

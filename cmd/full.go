@@ -24,17 +24,19 @@ func (r *FullCmd) Run(ctx *Context) error {
 		return fmt.Errorf("no token in cookies")
 	}
 
-	userData, err := purevpn.GetUserData(token[0].Value)
-	if err != nil {
-		return err
-	}
+	// userData, err := purevpn.GetUserData(token[0].Value)
+	// if err != nil {
+	// 	return err
+	// }
 
-	if ctx.Config.Debug {
-		fmt.Println("Successfully parsed user data")
-	}
+	// if ctx.Config.Debug {
+	// 	fmt.Println("Successfully parsed user data")
+	// }
 
-	if ctx.Config.Subscription.Username == "" {
-		if ctx.Config.Subscription, err = userData.SelectSubscription(); err != nil {
+	if ctx.Config.Subscription == nil || ctx.Config.Subscription.Username == "" || ctx.Config.Subscription.ID == "" {
+		if sub, err := purevpn.GetSubscriptions(page, ctx.Config, token[0].Value); err == nil {
+			ctx.Config.Subscription = sub.ToSubscriptionAuth()
+		} else {
 			return err
 		}
 	}

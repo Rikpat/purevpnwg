@@ -26,16 +26,17 @@ Goal of the docker container is running as Kubernetes initContainer for WireGuar
 
 To get the file where needed mount the */out/* directory to volume. 
 
-Env variables:
+Env variables (yaml config uses - instead of . as separator, so cli needs to be --server-city not --server.city):
 
 | Variable                      | Description                                         | Required                                            | Default                                             | Config Equivalent     |
 |-------------------------------|-----------------------------------------------------|-----------------------------------------------------|-----------------------------------------------------|-----------------------|
 | PUREVPN_USERNAME              | PureVPN username (email)                            | x                                                   |                                                     | username              |
 | PUREVPN_PASSWORD              | PureVPN password                                    | x                                                   |                                                     | password              |
-| PUREVPN_SERVER_COUNTRY        | PureVPN server country                              |                                                     | DE (in docker only)                                 | server.country        |
-| PUREVPN_SERVER_CITY           | PureVPN server city                                 |                                                     | 2762 (in docker only)                               | server.city           |
-| PUREVPN_SUBSCRIPTION_ID       | PureVPN subscription ID                             | only if multiple, prompted if interactive shell     | fetched if only one                                 | subscription.username |
-| PUREVPN_SUBSCRIPTION_PASSWORD | PureVPN subscription password (used for connecting) |                                                     | fetched automatically, storing reduces calls by one | subscription.password |
+| PUREVPN_SERVER_COUNTRY        | PureVPN server country                              |                                                     | DE (in docker only)                                 | server-country        |
+| PUREVPN_SERVER_CITY           | PureVPN server city                                 |                                                     | 2762 (in docker only)                               | server-city           |
+| PUREVPN_SUBSCRIPTION_ID       | PureVPN subscription ID                             | only if multiple, prompted if interactive shell     | fetched if only one                                 | subscription-id       |
+| PUREVPN_SUBSCRIPTION_USERNAME | PureVPN subscription username0                      | only if multiple, prompted if interactive shell     | fetched if only one                                 | subscription-username |
+| PUREVPN_SUBSCRIPTION_PASSWORD | PureVPN subscription password (used for connecting) |                                                     | fetched automatically, storing reduces calls by one | subscription-password |
 | PUREVPN_DEVICE                | Platform, used in call for wireguard config         |                                                     | linux                                               | device                |
 | PUREVPN_WIREGUARD_FILE        | Output file to generate                             |                                                     | wg0.conf (/out/wg0.conf in docker)                  | wireguardFile         |
 
@@ -52,7 +53,8 @@ server: # Set to a server you want to connect to
   country: US 
   city: 7040
 subscription:
-  username: purevpn********* # If you have multiple subscriptions in your account
+  id: abcdefg # If you have multiple subscriptions in your account
+  username: purevpn********* # If you have multiple usernames in subscription
 wireguardFile: wg0-p2p.conf # If you want to have a different file location
 ```
 

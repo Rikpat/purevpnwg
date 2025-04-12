@@ -29,8 +29,10 @@ func (r *LoginCmd) Run(ctx *Context) error {
 	}
 
 	config.UUID = userData.AccountCode
-	if config.Subscription == nil || config.Subscription.Username == "" || config.Subscription.Password == "" {
-		if config.Subscription, err = userData.SelectSubscription(); err != nil {
+	if config.Subscription == nil || config.Subscription.Username == "" || config.Subscription.Password == "" || ctx.Config.Subscription.ID == "" {
+		if sub, err := purevpn.GetSubscriptions(page, ctx.Config, token[0].Value); err == nil {
+			ctx.Config.Subscription = sub.ToSubscriptionAuth()
+		} else {
 			return err
 		}
 

@@ -3,6 +3,7 @@ package purevpn
 import (
 	"fmt"
 	"net/url"
+	"strconv"
 	"time"
 
 	"github.com/Rikpat/purevpnwg/pkg/util"
@@ -98,7 +99,13 @@ func GetWireguardServer(page *rod.Page, config *util.Config, token string) (stri
 	params.Add("sCountrySlug", config.Server.Country)
 	params.Add("sDeviceType", config.Device)
 	params.Add("sClientPublicKey", publicKey)
-	params.Add("iCityId", config.Server.City)
+	params.Add("iCityId", strconv.Itoa(config.Server.City))
+	params.Add("sSubsId", config.Subscription.ID)
+	// There's some port forwarding logic for this variable, if you need this, feel free to create a PR
+	// const hasPF = currentSubscriptionData?.add_ons?.some(addOn => [addonConstants.port_forwarding_with_dedicated_ip, addonConstants.port_forwarding].includes(addOn.code))  ? true : false;
+	// const hasPFTTag = serverType.includes("PF")  ? true : false;
+	// const natServerBool = (hasPF && hasPFTTag)? "0" : "1";
+	params.Add("natServer", "1")
 
 	if config.Debug {
 		fmt.Printf("Requesting wireguard server with params: %v\n", params)
